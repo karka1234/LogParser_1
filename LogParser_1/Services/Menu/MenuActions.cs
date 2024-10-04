@@ -8,6 +8,8 @@ namespace LogParser_1.Services.Menu
 {
     internal abstract class MenuActions
     {
-        public abstract void Action(List<Dictionary<string, object>> record);
+
+        public abstract void Action(List<Dictionary<string, object>> record, out string statusString);
+        //public abstract Task ActionAsync(List<Dictionary<string, object>> record);
     }
 }

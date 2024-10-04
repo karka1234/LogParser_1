@@ -9,9 +9,7 @@ namespace LogParser_1.OPTIONS
     internal static class Options
     {
         public const string availableFileExtension = ".csv";
-
-        public const string connectionString = "Data Source=log.log";
-
+        public const string connectionStringDefaultPath = @"Data Source=C:\Users\karsi\source\repos\LogParser_1\LogParser_1\DATA\";
 
     }
 }
