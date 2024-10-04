@@ -33,48 +33,72 @@ namespace LogParser_1.Services
             return records;
         }
 
-
-
-        public static List<Dictionary<string, object>> ProcessQuery(List<Dictionary<string, object>> records, string query)
+        public static List<Dictionary<string, object>> ProcessQuery(List<Dictionary<string, object>> records)
         {
-            var match = Regex.Match(query, @"(?i)select\s+FROM\s+(\w+)\s+WHERE\s+text\s*=\s*'([^']*)'|(\w+)\s*=\s*'([^']*)'");// (\w+) key  '([^']*)' value
-            /*
-            if (!match.Success)
+            Console.WriteLine("Enter your query (format: column_name = 'search_string' or select FROM column_name WHERE text='search_string'):");
+            string query = Console.ReadLine();
+
+            List<Dictionary<string, object>> results = new List<Dictionary<string, object>>(records);
+
+            var pattern = @"(?i)(\w+)\s*=\s*'([^']*)'|select\s+FROM\s+(\w+)\s+WHERE\s+text\s*=\s*'([^']*)'";
+
+            var parts = Regex.Split(query, @"\s+(AND|OR)\s+", RegexOptions.IgnoreCase).Where(p => !string.IsNullOrWhiteSpace(p)).ToList();
+
+            if (parts.Count == 0)
             {
-                return "Invalid query format.";
-            }*/
+                Console.WriteLine("Invalid query format.");
+                return results;
+            }
 
-            string columnName = match.Groups[1].Success ? match.Groups[1].Value : match.Groups[3].Value;
-            string searchString = match.Groups[2].Success ? match.Groups[2].Value : match.Groups[4].Value;
+            bool useAnd = true;
 
-           /* if (!records.Any() || !records[0].ContainsKey(columnName))
+            for (int i = 0; i < parts.Count; i++)
             {
-                return $"Column '{columnName}' not found.";
-            }*/
+                var part = parts[i].Trim();
 
-            List<Dictionary<string, object>> results = records
-                .Where(r => r[columnName]?.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false)
-                .ToList();
+                if (part.Equals("AND", StringComparison.OrdinalIgnoreCase))
+                {
+                    useAnd = true;
+                    continue;
+                }
 
+                if (part.Equals("OR", StringComparison.OrdinalIgnoreCase))
+                {
+                    useAnd = false;
+                    continue;
+                }
+
+                var match = Regex.Match(part, pattern);
+
+                if (!match.Success)
+                {
+                    Console.WriteLine($"Invalid condition in query: '{part}'.");
+                    return new List<Dictionary<string, object>>();
+                }
+
+                string columnName = match.Groups[1].Success ? match.Groups[1].Value : match.Groups[3].Value;
+                string searchString = match.Groups[2].Success ? match.Groups[2].Value : match.Groups[4].Value;
+
+                if (!records.Any() || !records[0].ContainsKey(columnName))
+                {
+                    Console.WriteLine($"Column '{columnName}' not found.");
+                    return new List<Dictionary<string, object>>();
+                }
+
+                if (useAnd)
+                {
+                    results = results.Where(r => r[columnName]?.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false).ToList();
+                }
+                else
+                {
+                    var orResults = records.Where(r => r[columnName]?.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false).ToList();
+                    results = results.Union(orResults).ToList();
+                }
+            }
             return results;
         }
 
 
-        public static List<string> GetHeaders(List<Dictionary<string, object>> records)
-        { 
-            List<string> headers = new List<string>();
-            headers = records[0].Keys.ToList();
-            return headers;
-        }
 
-        public static void PrintToConsoleList(string header, List<string> data)
-        {
-            Console.WriteLine(header);
-            foreach (var item in data)
-            {
-                Console.Write(item + "; ");
-            }
-            Console.WriteLine();
-        }
     }
 }

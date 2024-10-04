@@ -3,6 +3,7 @@ using LogParser_1.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
@@ -27,8 +28,8 @@ namespace LogParser_1.UI
                 {
                     case ConsoleKey.F1:////perkelt i klases viduje esancius dalykus kad funkcionalumas issiskaidytu
                         string filePath = @"C:\Users\karsi\source\repos\LogParser_1\LogParser_1\DATA\20220601182758.csv";// GetGoodFilePath();
-                        record = ProcessData.ParseLogCsv(filePath);
-                        statusString = "File succesfully parsed";
+                        record.AddRange(ProcessData.ParseLogCsv(filePath)); // multi files
+                        statusString = $"File succesfully parsed : {record.Count} current data rows in memory";
                         break;
                     case ConsoleKey.F2:
                         if (!(record.Count > 0))
@@ -39,23 +40,28 @@ namespace LogParser_1.UI
                         do
                         {
                             Console.Clear();
-                            Console.WriteLine("\r\n'ESC' - To exit\r\n");
-                            Console.WriteLine("Enter your query (format: column_name = 'search_string' or select FROM column_name WHERE text='search_string'):");
-                            ProcessData.PrintToConsoleList("Existing collumns", ProcessData.GetHeaders(record));
+                            Console.WriteLine("'ESC' - To exit\r\n");                           
 
-                            string query = Console.ReadLine();
-                            List<Dictionary<string, object>> result = ProcessData.ProcessQuery(record, query);
+                            PrintToConsoleList("Existing collumns", GetHeaders(record));
+
+                            List<Dictionary<string, object>> result = ProcessData.ProcessQuery(record);
 
                             Dictionary<string, object> additionalData = new Dictionary<string, object>();
                             additionalData.Add("Counter", result.Count);
-                            result.Add(additionalData);
+                            result.Add(additionalData);                           
 
-                            var jsonResult = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });                            
-
-                            Console.WriteLine(jsonResult);
-
-
-                            Console.WriteLine("\r\nAnyKey to Contunue\r\n");
+                            if (result.Count > 100)
+                            {
+                                Console.WriteLine("\r\nTotal amount of results : " + result.Count);
+                                Console.WriteLine("Do you really want to print ? 'ENTER' - To print ");
+                                if (Console.ReadKey().Key == ConsoleKey.Enter)
+                                {
+                                    var jsonResult = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
+                                    Console.WriteLine(jsonResult);
+                                }
+                            }                           
+                            
+                            Console.WriteLine("\r\n\nAnyKey to Contunue\r\n");
                             Console.ReadKey(true);
                         }
                         while (readConsole.Key != ConsoleKey.Escape);
@@ -77,7 +83,8 @@ namespace LogParser_1.UI
             Console.WriteLine("'F1' - Select and parse .CSV file");
             Console.WriteLine("'F2' - Search in parsed data");
             Console.WriteLine("\r\n'ESC' - To exit\r\n");
-            Console.WriteLine(status);
+            if(status != "")
+                Console.WriteLine($"---+ {status} +---\r\n");
         }
 
 
@@ -98,7 +105,22 @@ namespace LogParser_1.UI
             return filePath;
         }
 
+        private static List<string> GetHeaders(List<Dictionary<string, object>> records)
+        {
+            List<string> headers = new List<string>();
+            headers = records[0].Keys.ToList();
+            return headers;
+        }
 
+        private static void PrintToConsoleList(string header, List<string> data)
+        {
+            Console.WriteLine(header);
+            foreach (var item in data)
+            {
+                Console.Write(item + "; ");
+            }
+            Console.WriteLine();
+        }
 
     }
 }

@@ -13,7 +13,7 @@ namespace LogParser_1
         {
             MenuManager.Menu();
 
-
+            ///file size patikra
 
 
             /*
