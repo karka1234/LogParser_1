@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LogParser_1.Services.Menu
 {
-    internal class MenuReadFile : MenuActions
+    internal class MenuReadFile : MenuElements
     {
         public override void Action(List<Dictionary<string, object>> record, out string statusString)//async reiktu bet ar to reikia nzn
         {
@@ -25,39 +25,39 @@ namespace LogParser_1.Services.Menu
                     case ConsoleKey.F1 :
                         Console.Clear();
                         filePath = @"C:\Users\karsi\source\repos\LogParser_1\LogParser_1\DATA\20220601182758.csv";// GetGoodFilePath();
-                        fileName = Path.GetFileNameWithoutExtension(filePath);
-                        fileDirectory = Path.GetDirectoryName(filePath);
-
-                        record.AddRange(FileManager.ParseLogCsv(filePath));
+                        record.AddRange(FileManager.ParseLogCsv(filePath));//multi files
                         statusString = $"File succesfully parsed : {record.Count} current data rows in memory";
 
                         break;
                     case ConsoleKey.F2 :
+                        if (!record.Any())                        
+                            break;                        
                         Console.Clear();
-                        string newFilePath = $"{fileDirectory}\\{fileName}_parsed.json";
+                        string newFilePath = Options.outputJsonFilesPath + "FullParsedData.json";
                         FileManager.StreamWriter(record, newFilePath);///await reikia
 
-                        statusString = newFilePath;
+                        statusString = "Json file created : " + newFilePath;
                         break;                               
                     case ConsoleKey.F3 :
+                        if (!record.Any())
+                            break;
                         Console.Clear();
-                        DbManager.CreateAndInsertLogsIntoDatabase(record);
-                        statusString = "db updated";
+                        DataBaseManager.CreateAndInsertLogsIntoDatabase(record);
+                        statusString = "Database updated";
                         break;
                     default:
                         break;
                 }
             }
             while (consoleKey.Key != ConsoleKey.Escape);
-
         }
-
-        private static void PrintMenu(string status)
+        public override void PrintMenu(string status)
         {
             Console.Clear();
-            Console.WriteLine("Menu > Select and parse .CSV file");
+            Console.WriteLine("Menu > ");
             Console.WriteLine("\r\nPress your option\r\n");
             Console.WriteLine("'F1' - Read And Parse Files");
+            Console.WriteLine();
             Console.WriteLine("'F2' - Write To Json File");
             Console.WriteLine("'F3' - Write To DataBase");
 
@@ -65,8 +65,6 @@ namespace LogParser_1.Services.Menu
             if (status != "")
                 Console.WriteLine($"---+ {status} +---\r\n");
         }
-
-
         private static string GetGoodFilePath()
         {
             string filePath = "";

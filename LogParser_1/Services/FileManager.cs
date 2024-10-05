@@ -34,8 +34,7 @@ namespace LogParser_1.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
-                Console.ReadKey();
+                Exeptions.ExeptionsHandler(ex);
             }
             return records;
         }
@@ -57,8 +56,7 @@ namespace LogParser_1.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
-                Console.ReadKey();
+                Exeptions.ExeptionsHandler(ex);
             }
         }
 
@@ -74,8 +72,7 @@ namespace LogParser_1.Services
             }                        
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
-                Console.ReadKey();
+                Exeptions.ExeptionsHandler(ex);
             }
             return result;
         }

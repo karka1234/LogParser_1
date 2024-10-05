@@ -10,6 +10,8 @@ namespace LogParser_1.OPTIONS
     {
         public const string availableFileExtension = ".csv";
         public const string connectionStringDefaultPath = @"Data Source=C:\Users\karsi\source\repos\LogParser_1\LogParser_1\DATA\";
+        public const string outputJsonFilesPath = @"C:\Users\karsi\source\repos\LogParser_1\LogParser_1\DATA\";
+        public const string outputDBFilesPath = @"C:\Users\karsi\source\repos\LogParser_1\LogParser_1\DATA\";
 
     }
 }

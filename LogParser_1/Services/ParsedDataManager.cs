@@ -13,9 +13,7 @@ namespace LogParser_1.Services
 {
     internal static class ParsedDataManager
     {
-
-
-        public static List<Dictionary<string, object>> GetAndProcessQuery(List<Dictionary<string, object>> records)
+        public static List<Dictionary<string, object>> GetAndFilterRecords(List<Dictionary<string, object>> records)
         {
             Console.WriteLine("\r\nEnter your query (format: column_name = 'search_string' or select FROM column_name WHERE text='search_string'):");
             string query = Console.ReadLine();
@@ -24,16 +22,9 @@ namespace LogParser_1.Services
 
             var parts = Regex.Split(query, @"\s+(AND|OR)\s+", RegexOptions.IgnoreCase).Where(p => !string.IsNullOrWhiteSpace(p)).ToList();
 
-            if (parts.Count == 0)
-            {
-                Console.WriteLine("Invalid query format.");
-                return new List<Dictionary<string, object>>();//return empty
-            }
-
             List<Dictionary<string, object>> results = new List<Dictionary<string, object>>(records);
 
             bool useAnd = true;
-
             for (int i = 0; i < parts.Count; i++)
             {
                 var part = parts[i].Trim();
@@ -96,6 +87,15 @@ namespace LogParser_1.Services
             Dictionary<string, object> additionalData = new Dictionary<string, object>();
             additionalData.Add("Counter", records.Count);
             return additionalData;
+        }
+
+        public static void PrintToConsoleDictionary(string header, List<Dictionary<string, object>> records)
+        {
+            List<string> data = new List<string>();
+            Console.WriteLine(header);
+            data = records[0].Keys.Select(r => r + "; ").ToList();
+            data.ForEach(d => { Console.Write(d); });
+            Console.WriteLine();
         }
     }
 }
