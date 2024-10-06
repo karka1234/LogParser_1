@@ -1,4 +1,5 @@
 ﻿using LogParser_1.OPTIONS;
+using LogParser_1.Services.Managers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,7 +12,7 @@ namespace LogParser_1.Services.Menu
 {
     internal class MenuManipulateData : MenuElements
     {
-        public override void Action(List<Dictionary<string, object>> record, out string statusString)///////prideti galimybe saugoti irasusi i db ir i json
+        public override void Action(List<Dictionary<string, object>> record, out string statusString)
         {
             statusString = "";
             List<Dictionary<string, object>> filteredResultRecords = new List<Dictionary<string, object>>();
@@ -26,7 +27,7 @@ namespace LogParser_1.Services.Menu
                     case ConsoleKey.F1:
                         Console.Clear();
                         Console.WriteLine("'ESC' - To exit\r\n");
-                        ParsedDataManager.PrintToConsoleDictionary("Existing collumns", record);
+                        ParsedDataManager.PrintToConsoleListKeys("Existing collumns", record);
                         filteredResultRecords = ParsedDataManager.GetAndFilterRecords(record);                        
                         if (!filteredResultRecords.Any())                            
                             break;                                                       

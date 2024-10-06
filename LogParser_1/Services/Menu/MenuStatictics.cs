@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LogParser_1.Services.Managers;
 
 namespace LogParser_1.Services.Menu
 {
     internal class MenuStatictics : MenuElements
     {
-        public override void Action(List<Dictionary<string, object>> record, out string statusString)///////prideti galimybe saugoti irasusi i db ir i json
+        public override void Action(List<Dictionary<string, object>> record, out string statusString)
         {
             statusString = "";
-            List<Dictionary<string, object>> filteredResultRecords = new List<Dictionary<string, object>>();
+            List<Dictionary<string, object>> filteredResultRecords = new List<Dictionary<string, object>>(record);
             ConsoleKeyInfo consoleKey;
             do
             {
@@ -23,28 +24,18 @@ namespace LogParser_1.Services.Menu
                     case ConsoleKey.F1:
                         Console.Clear();
                         Console.WriteLine("'ESC' - To exit\r\n");
-                        ParsedDataManager.PrintToConsoleDictionary("Existing collumns", record);
+                        ParsedDataManager.PrintToConsoleListKeys("Existing collumns", record);
                         filteredResultRecords = ParsedDataManager.GetAndFilterRecords(record);
                         if (!filteredResultRecords.Any())
                             break;
                         break;
                     case ConsoleKey.F2:
-                        if (!filteredResultRecords.Any())
-                            break;
                         Console.Clear();
-
-                        break;
-                    case ConsoleKey.F3:
-                        if (!filteredResultRecords.Any())
-                            break;
-                        Console.Clear();
-
-                        break;
-                    case ConsoleKey.F4:
-                        if (!filteredResultRecords.Any())
-                            break;
-                        Console.Clear();
-
+                        Console.WriteLine("'ESC' - To exit\r\n");
+                        ParsedDataManager.PrintToConsoleListKeys("Existing collumns", record);
+                        ParsedDataManager.PrintStatiscticsToConsole(ParsedDataManager.GetStatiscticsBasedOnCol(filteredResultRecords));
+                        Console.WriteLine("Press Any Key To Continue");
+                        Console.ReadKey(true);
                         break;
                     default:
                         break;
@@ -60,11 +51,7 @@ namespace LogParser_1.Services.Menu
             Console.WriteLine("\r\nPress your option\r\n");
             Console.WriteLine("'F1' - Filter records");
             Console.WriteLine();
-            Console.WriteLine("'F2' - "); // sort by date   // ivesim ranka collumn kuris atsakingas uz data
-            Console.WriteLine("'F3' - "); // severity statistic   // ivesim severity lauka ir gausim kiek yra tarkim su 5 su 4
-            Console.WriteLine("'F4' - "); // messages out with date and severity   // ivesim ranka message lauka ir severity lauka ir gausim visus msg su severity rikiuotu nuo didziausio
-            //kazka su dublikatais daryt ? kur tarkim msg laukai juos sutraukt bet irgi ivesim msg lauka
-
+            Console.WriteLine("'F2' - Statistics based on col");
 
             Console.WriteLine("\r\n'ESC' - To exit\r\n");
             if (status != "")

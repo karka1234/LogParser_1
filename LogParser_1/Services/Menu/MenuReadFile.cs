@@ -1,4 +1,5 @@
 ﻿using LogParser_1.OPTIONS;
+using LogParser_1.Services.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace LogParser_1.Services.Menu
 {
     internal class MenuReadFile : MenuElements
     {
-        public override void Action(List<Dictionary<string, object>> record, out string statusString)//async reiktu bet ar to reikia nzn
+        public override void Action(List<Dictionary<string, object>> record, out string statusString)//async ??
         {
             Console.Clear();
             statusString = "";
@@ -24,10 +25,9 @@ namespace LogParser_1.Services.Menu
                 {
                     case ConsoleKey.F1 :
                         Console.Clear();
-                        filePath = @"C:\Users\karsi\source\repos\LogParser_1\LogParser_1\DATA\20220601182758.csv";// GetGoodFilePath();
+                        filePath = GetGoodFilePath();
                         record.AddRange(FileManager.ParseLogCsv(filePath));//multi files
                         statusString = $"File succesfully parsed : {record.Count} current data rows in memory";
-
                         break;
                     case ConsoleKey.F2 :
                         if (!record.Any())                        
@@ -35,7 +35,6 @@ namespace LogParser_1.Services.Menu
                         Console.Clear();
                         string newFilePath = Options.outputJsonFilesPath + "FullParsedData.json";
                         FileManager.StreamWriter(record, newFilePath);///await reikia
-
                         statusString = "Json file created : " + newFilePath;
                         break;                               
                     case ConsoleKey.F3 :
